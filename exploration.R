@@ -83,10 +83,29 @@ events_train %>%
   theme(axis.text.x = element_text(angle = 90,
                                    hjust = 1)) +
   coord_fixed(ratio=0.65) +
-  labs(title = "Proportion of Successful Passes by Position on a Pitch",
+  labs(title = "Proportion of Successful Passes by Position on the Pitch",
        x = "",
        y = "") + 
   theme(axis.ticks.x = element_blank(),
         axis.ticks.y = element_blank(),
         axis.text.x = element_blank(),
         axis.text.y = element_blank())
+rm(football_pitch, fp)
+
+
+
+
+cor_events_train <- events_train %>%
+  dplyr::select(assist:fairplay) %>%
+  cor
+p.cor_events_train <- events_train %>%
+  dplyr::select(assist:fairplay) %>%
+  cor %>%
+  cor_pmat
+cor_events_train %>%
+  ggcorrplot(lab = TRUE, type = "lower", method = "circle",
+             insig = "blank", p.mat = p.cor_events_train,
+             sig.level = 0.05,
+             ggtheme = theme_gdocs(),
+             colors = c("#6D9EC1", "white", "#E46726"),
+             title = "Correlation Plot of Logical Variables", legend.title = "Correlation")
