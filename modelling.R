@@ -1,5 +1,8 @@
-
-
+##################################################################################
+# construct a logistic regression model
+# uses a selection of appropriate variables
+# output from summary(model_lr) is used for feature selection
+##################################################################################
 model_lr <- glm(accurate~.,
                 family = "binomial",
                 data = events_train %>%
@@ -14,6 +17,10 @@ model_lr <- glm(accurate~.,
                   mutate(teamId = factor(teamId)))
 summary(model_lr)
 
+##################################################################################
+# the function below takes an events dataset and converts it to a form suitable
+# for using to construct a logistic regression model (as per the summary output)
+##################################################################################
 events_to_lr <- function(data) {
   data %>%
     dplyr::select(subEventName,
@@ -35,6 +42,9 @@ events_to_lr <- function(data) {
     return()
 }
 
+##################################################################################
+# train the logistic regression model and define predictions
+##################################################################################
 model_lr <- glm(accurate~.,
                 family = "binomial",
                 data = events_to_lr(events_train))
@@ -42,15 +52,17 @@ model_lr <- glm(accurate~.,
 preds_lr <- predict.glm(model_lr,
                         events_to_lr(events_test),
                         type = "response")
+
+##################################################################################
+# view confusion matrix. accuracy is around 85.24%
+##################################################################################
 confusionMatrix(factor(preds_lr>0.5), factor(events_test$accurate), positive = "TRUE")
 
-
-
-
-
-
-# KNN
-
+##################################################################################
+# this section aims to train a KNN model, however the dataset is too large
+# jaccard distance needs to be calculated for 237435*41905 pairs of observations
+# DO NOT RUN
+##################################################################################
 events_to_train_knn <- function(data) {
   data %>%
     dplyr::select(subEventName, assist:x_start) %>%
@@ -87,14 +99,16 @@ model_knn <- knn(
   id = "ID"
 )
 
+##################################################################################
+# construct a decision tree
+##################################################################################
 
-
-
-
-#####################
-# decision tree
-#####################
-
+##################################################################################
+# the function below takes an events dataset and converts it to a form suitable
+# for using to construct a decision tree
+# IMPROVEMENT: summary(model_lm) was used again for feature selection. ideally,
+# the decision tree would not rely on summary statistics from another model
+##################################################################################
 events_to_dt <- function(data) {
   data %>%
     dplyr::select(subEventName,
@@ -109,19 +123,24 @@ events_to_dt <- function(data) {
     return()
 }
 
-
-
-# the train function in the caret package is used to select an optimal complexity parameter (cp) using 25 bootstrap samples with replacement
+##################################################################################
+# the train function in the caret package is used to select an optimal
+# complexity parameter (cp) using 25 bootstrap samples with replacement
+##################################################################################
 set.seed(64)
 model_tree_cv <- train(accurate~.,
                        method = "rpart",
                        tuneGrid = data.frame(cp = seq(0, 0.05, len = 25)),
                        data = events_to_dt(events_train))
 
+##################################################################################
 # visualise the performance of each cp
+##################################################################################
 ggplot(model_tree_cv, highlight = TRUE)
 
-# observe the large error for each cp
+##################################################################################
+# visualise the error for each cp
+##################################################################################
 model_tree_cv$results %>% 
   ggplot(aes(x = cp, y = Accuracy)) +
   geom_line() +
@@ -130,49 +149,44 @@ model_tree_cv$results %>%
                     ymin = Accuracy - AccuracySD,
                     ymax = Accuracy + AccuracySD))
 
+##################################################################################
 # define the optimal cp
+##################################################################################
 opt_cp <- model_tree_cv$bestTune
 
+##################################################################################
 # redefine the model using the train data set and optimal cp
+# NOTE: this is only retrained with the rpart function to allow for the plot below
+##################################################################################
 model_tree <- rpart(accurate~., cp = opt_cp, data = events_to_dt(events_train)) 
 
+##################################################################################
 # plot the model - this really helps to understand how the algorithm works
+##################################################################################
 rpart.plot(model_tree, type = 5)
 title("Decision Tree")
 
-# the predict function returns probabilities, much like the logistic regression model
-# these probabilities are are the proportions of each class that exists in each node
-# again, a typical cutoff is 0.5, however sensitivity is important in this scenario
-# cv will decide on an optimal cutoff which increases the mean of the accuracy and the sensitivity
-
-preds_tree <- predict(model_tree, events_to_dt(events_test))[,2] > 0.5
-confusionMatrix(factor(preds_tree), factor(events_test$accurate),
+##################################################################################
+# define predictions and view confusion matrix. accuracy is around 85.36%
+##################################################################################
+preds_tree <- predict(model_tree, events_to_dt(events_test))[,2]
+confusionMatrix(factor(preds_tree>0.5), factor(events_test$accurate),
                 positive = "TRUE")
 
-
-
-
-
-
-
-
-
-######################
+##################################################################################
 # random forest
-######################
-
-
+# similar to KNN, the dataset is too large to train this algorithm in a reasonable time
+# DO NOT RUN
+##################################################################################
 model_rf <- train(accurate~.,
                   method = "rf",
                   tuneGrid = data.frame(mtry = 3:11),
                   data = events_to_dt(events_train))
 
-# visualise the performance of each mtry
 ggplot(model_rf, highlight = TRUE) +
   scale_x_discrete(limits = 2:12) +
   ggtitle("Accuracy for each number of randomly selected predictors")
 
-# again, note the variability of each mtry
 model_rf$results %>% 
   ggplot(aes(x = mtry, y = Accuracy)) +
   geom_line() +
@@ -181,12 +195,16 @@ model_rf$results %>%
                     ymin = Accuracy - AccuracySD,
                     ymax = Accuracy + AccuracySD))
 
-# create predictions
 preds_rf <- predict(model_rf, test)
 
-# confusion matrix
 cm_rf <- confusionMatrix(preds_rf, test$class)
 
-# the importance of each variable is also accessible via the importance function
-# polyuria is a clear winner, meaning it is likely to be the root note in most of the decision trees in the forest
 importance(model_rf$finalModel)
+
+##################################################################################
+# ensemble of logistic regression and decision tree
+# simply take the mean of each probability prediction
+# confusion matrix indicates accuracy of around 85.46%
+##################################################################################
+preds_ens <- (predict(model_tree, events_to_dt(events_test))[,2] + preds_lr)/2
+confusionMatrix(factor(preds_ens>0.5), factor(events_test$accurate), positive = "TRUE")

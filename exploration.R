@@ -1,26 +1,24 @@
-#########################################
-# this script explores the data with 
-# basic summaries and visualisations
-#########################################
+##################################################################################
+# this script explores the data with basic summaries and visualisations
+##################################################################################
 
-#########################################
+##################################################################################
 # mean success rate of passes
-#########################################
+##################################################################################
 events_train %$%
   mean(accurate)
 
-#########################################
+##################################################################################
 # successful passes split by variable high
-#########################################
+##################################################################################
 events_train %$%
   table(high, accurate)
 
-#########################################
-# the above table would be more intuitive 
-# if proportions were used instead of counts
+##################################################################################
+# the above table would be more intuitive if proportions were used instead of counts
 # e.g. what proportion of high passes were successful?
-# the function below achieves this for any variable
-#########################################
+# the function below achieves this for any specified variable
+##################################################################################
 #' generate row proportion table for accurate and one other tag variable
 #' @param tag  character - specifies the variable to compare against accurate
 #' @return     row proportion table for accurate and `tag`
@@ -53,16 +51,15 @@ acc_prop <- function(data, tag) {
     return
 }
 
-#########################################
+##################################################################################
 # test out function for a few variables
-#########################################
+##################################################################################
 acc_prop(events_train, "high")
 acc_prop(events_train, "keyPass")
 
-#########################################
-# here is code to plot the mean success
-# rate of passes by coordinates on a pitch
-#########################################
+##################################################################################
+# here is code to plot the mean success rate of passes by coordinates on a pitch
+##################################################################################
 if (!"football_pitch.png" %in% list.files())
   download.file("https://upload.wikimedia.org/wikipedia/commons/f/f3/Football_field_105x68.PNG",
                 destfile = "football_pitch.png")
@@ -90,11 +87,14 @@ events_train %>%
         axis.ticks.y = element_blank(),
         axis.text.x = element_blank(),
         axis.text.y = element_blank())
-rm(football_pitch, fp)
+# rm(football_pitch, fp)
 
 
 
-
+##################################################################################
+# correlation plot of logical variables
+# evidence that logistic regression may be appropriate
+##################################################################################
 cor_events_train <- events_train %>%
   dplyr::select(assist:fairplay) %>%
   cor
@@ -109,3 +109,4 @@ cor_events_train %>%
              ggtheme = theme_gdocs(),
              colors = c("#6D9EC1", "white", "#E46726"),
              title = "Correlation Plot of Logical Variables", legend.title = "Correlation")
+# rm(cor_events_train, p.cor_events_train)
