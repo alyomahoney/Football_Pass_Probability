@@ -19,15 +19,15 @@ if(!require(ggcorrplot)) install.packages("ggcorrplot", repos = "http://cran.us.
 if(!require(rpart))      install.packages("rpart", repos = "http://cran.us.r-project.org")
 if(!require(rpart.plot)) install.packages("rpart.plot", repos = "http://cran.us.r-project.org")
 
-library(caret)
-library(ggthemes)
-library(magrittr)
-library(modiscloud)
-library(rjson)
-library(tidyverse)
-library(png)
-library(grid)
-library(neighbr)
-library(ggcorrplot)
-library(rpart)
-library(rpart.plot)
+library(caret)      # machine learning (decision tree and confusion matrix)
+library(ggthemes)   # gdocs theme
+library(magrittr)   # %$% and %<>%
+#library(modiscloud) 
+library(rjson)      # read .json files
+library(tidyverse)  # tidyverse suite of packages
+library(png)        # read .png file
+library(grid)       # render raster object (for including in ggplot)
+library(neighbr)    # knn with jaccard distance
+library(ggcorrplot) # correlation plot
+library(rpart)      # construct decision tree
+library(rpart.plot) # plot decision tree algorithm

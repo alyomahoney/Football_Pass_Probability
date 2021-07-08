@@ -106,7 +106,7 @@ model_knn <- knn(
 ##################################################################################
 # the function below takes an events dataset and converts it to a form suitable
 # for using to construct a decision tree
-# IMPROVEMENT: summary(model_lm) was used again for feature selection. ideally,
+# IMPROVEMENT: summary(model_lr) was used again for feature selection. ideally,
 # the decision tree would not rely on summary statistics from another model
 ##################################################################################
 events_to_dt <- function(data) {

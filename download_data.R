@@ -14,13 +14,6 @@ if (!"events_England.json" %in% list.files("data")) {
 }
 
 ##################################################################################
-# download teams data set
-##################################################################################
-if (!"teams.json" %in% list.files("data"))
-  download.file(url = "https://ndownloader.figshare.com/files/15073697",
-                destfile = "data/teams.json")
-
-##################################################################################
 # download tag identifier data set
 ##################################################################################
 if (!"tags2name.csv" %in% list.files("data"))

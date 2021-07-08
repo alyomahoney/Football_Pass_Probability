@@ -118,5 +118,3 @@ events_test <-
   events %>%
   slice(test_index)
 # rm(events_df_tidy, test_index, validation_index)
-
-
