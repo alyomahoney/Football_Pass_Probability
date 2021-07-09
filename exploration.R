@@ -108,5 +108,5 @@ cor_events_train %>%
              sig.level = 0.05,
              ggtheme = theme_gdocs(),
              colors = c("#6D9EC1", "white", "#E46726"),
-             title = "Correlation Plot of Logical Variables", legend.title = "Correlation")
+             title = "Correlation Plot of\nLogical Variables", legend.title = "Correlation")
 # rm(cor_events_train, p.cor_events_train)

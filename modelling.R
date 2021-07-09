@@ -63,41 +63,41 @@ confusionMatrix(factor(preds_lr>0.5), factor(events_test$accurate), positive = "
 # jaccard distance needs to be calculated for 237435*41905 pairs of observations
 # DO NOT RUN
 ##################################################################################
-events_to_train_knn <- function(data) {
-  data %>%
-    dplyr::select(subEventName, assist:x_start) %>%
-    mutate(y_middle = between(y_start, 30, 70),
-           near_goal = x_start>60,
-           hand_pass = subEventName == "Hand pass",
-           simple_pass = subEventName == "Simple pass",
-           ID = 1:n()) %>%
-    dplyr::select(-x_start,
-                  -y_start,
-                  -subEventName) %>%
-    return()
-}
-
-events_to_test_knn <- function(data) {
-  data %>%
-    dplyr::select(subEventName, assist:x_start) %>%
-    mutate(y_middle = between(y_start, 30, 70),
-           near_goal = x_start>60,
-           hand_pass = subEventName == "Hand pass",
-           simple_pass = subEventName == "Simple pass") %>%
-    dplyr::select(-x_start,
-                  -y_start,
-                  -subEventName,
-                  -accurate)
-}
-
-model_knn <- knn(
-  train_set = events_to_train_knn(events_train),
-  test_set = events_to_test_knn(events_test),
-  k = 5,
-  categorical_target = "accurate",
-  comparison_measure = "jaccard",
-  id = "ID"
-)
+#events_to_train_knn <- function(data) {
+#  data %>%
+#    dplyr::select(subEventName, assist:x_start) %>%
+#    mutate(y_middle = between(y_start, 30, 70),
+#           near_goal = x_start>60,
+#           hand_pass = subEventName == "Hand pass",
+#           simple_pass = subEventName == "Simple pass",
+#           ID = 1:n()) %>%
+#    dplyr::select(-x_start,
+#                  -y_start,
+#                  -subEventName) %>%
+#    return()
+#}
+#
+#events_to_test_knn <- function(data) {
+#  data %>%
+#    dplyr::select(subEventName, assist:x_start) %>%
+#    mutate(y_middle = between(y_start, 30, 70),
+#           near_goal = x_start>60,
+#           hand_pass = subEventName == "Hand pass",
+#           simple_pass = subEventName == "Simple pass") %>%
+#    dplyr::select(-x_start,
+#                  -y_start,
+#                  -subEventName,
+#                  -accurate)
+#}
+#
+#model_knn <- knn(
+#  train_set = events_to_train_knn(events_train),
+#  test_set = events_to_test_knn(events_test),
+#  k = 5,
+#  categorical_target = "accurate",
+#  comparison_measure = "jaccard",
+#  id = "ID"
+#)
 
 ##################################################################################
 # construct a decision tree
@@ -178,29 +178,29 @@ confusionMatrix(factor(preds_tree>0.5), factor(events_test$accurate),
 # similar to KNN, the dataset is too large to train this algorithm in a reasonable time
 # DO NOT RUN
 ##################################################################################
-model_rf <- train(accurate~.,
-                  method = "rf",
-                  tuneGrid = data.frame(mtry = 3:11),
-                  data = events_to_dt(events_train))
-
-ggplot(model_rf, highlight = TRUE) +
-  scale_x_discrete(limits = 2:12) +
-  ggtitle("Accuracy for each number of randomly selected predictors")
-
-model_rf$results %>% 
-  ggplot(aes(x = mtry, y = Accuracy)) +
-  geom_line() +
-  geom_point() +
-  geom_errorbar(aes(x = mtry, 
-                    ymin = Accuracy - AccuracySD,
-                    ymax = Accuracy + AccuracySD))
-
-preds_rf <- predict(model_rf, test)
-
-cm_rf <- confusionMatrix(preds_rf, test$class)
-
-importance(model_rf$finalModel)
-
+#model_rf <- train(accurate~.,
+#                  method = "rf",
+#                  tuneGrid = data.frame(mtry = 3:11),
+#                  data = events_to_dt(events_train))
+#
+#ggplot(model_rf, highlight = TRUE) +
+#  scale_x_discrete(limits = 2:12) +
+#  ggtitle("Accuracy for each number of randomly selected predictors")
+#
+#model_rf$results %>% 
+#  ggplot(aes(x = mtry, y = Accuracy)) +
+#  geom_line() +
+#  geom_point() +
+#  geom_errorbar(aes(x = mtry, 
+#                    ymin = Accuracy - AccuracySD,
+#                    ymax = Accuracy + AccuracySD))
+#
+#preds_rf <- predict(model_rf, test)
+#
+#cm_rf <- confusionMatrix(preds_rf, test$class)
+#
+#importance(model_rf$finalModel)
+#
 ##################################################################################
 # ensemble of logistic regression and decision tree
 # simply take the mean of each probability prediction
