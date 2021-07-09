@@ -24,6 +24,9 @@ Here is where the models are trained (using the train dataset). A logistic regre
 
 Note that the script also includes code to construct a random forest and a k-NN model. The models took too long to run for the purposes of this project (and may have even exhausted the computer's memory) however they are left in for reference.
 
+### `final_model.R`
+This script trains the final model (using the train and test datasets) and assesses its performance using the validation dataset.
+
 ### `data`
 This folder is a location for the downloaded data to be stored. The events_England.json file is not stored in this repo as it exceedes the 100MB limit.
 

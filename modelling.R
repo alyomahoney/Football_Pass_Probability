@@ -3,19 +3,19 @@
 # uses a selection of appropriate variables
 # output from summary(model_lr) is used for feature selection
 ##################################################################################
-model_lr <- glm(accurate~.,
-                family = "binomial",
-                data = events_train %>%
-                  dplyr::select(subEventName,
-                                teamId,
-                                assist:fairplay,
-                                y_start_cut,
-                                x_start_cut,
-                                accurate,
-                                eventSec,
-                                matchPeriod) %>%
-                  mutate(teamId = factor(teamId)))
-summary(model_lr)
+model_lr_v1 <- glm(accurate~.,
+                   family = "binomial",
+                   data = events_train %>%
+                     dplyr::select(subEventName,
+                                   teamId,
+                                   assist:fairplay,
+                                   y_start_cut,
+                                   x_start_cut,
+                                   accurate,
+                                   eventSec,
+                                   matchPeriod) %>%
+                     mutate(teamId = factor(teamId)))
+summary(model_lr_v1)
 
 ##################################################################################
 # the function below takes an events dataset and converts it to a form suitable
@@ -59,7 +59,7 @@ preds_lr <- predict.glm(model_lr,
 confusionMatrix(factor(preds_lr>0.5), factor(events_test$accurate), positive = "TRUE")
 
 ##################################################################################
-# this section aims to train a KNN model, however the dataset is too large
+# this section aims to train a k-NN model, however the dataset is too large
 # jaccard distance needs to be calculated for 237435*41905 pairs of observations
 # DO NOT RUN
 ##################################################################################
