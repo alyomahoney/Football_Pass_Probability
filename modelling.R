@@ -180,9 +180,9 @@ confusionMatrix(factor(preds_tree>0.5), factor(events_test$accurate),
 set.seed(4)
 model_rf <- train(accurate~.,
                   method = "Rborist",
-                  tuneGrid = data.frame(predFixed = 2:4,
+                  tuneGrid = data.frame(predFixed = 6:11,
                                         minNode = 2),
-                  nTree = 100,
+                  nTree = 200,
                   nSamp = 100000,
                   data = events_to_dt(events_train))
 
@@ -198,14 +198,17 @@ model_rf$results %>%
                     ymin = Accuracy - AccuracySD,
                     ymax = Accuracy + AccuracySD))
 
-preds_rf <- predict(model_rf, events_to_dt(events_test), type = "prob")
-
-confusionMatrix(preds_rf, factor(events_test$accurate), positive = "TRUE")
+preds_rf <- predict(model_rf, events_to_dt(events_test), type = "prob")[,2]
+confusionMatrix(factor(preds_rf>0.5), factor(events_test$accurate), positive = "TRUE")
 
 ##################################################################################
-# ensemble of logistic regression and decision tree
+# ensemble 1: logistic regression and decision tree
+# ensemble 2: logistic regression, decision tree and random forest
 # simply take the mean of each probability prediction
-# confusion matrix indicates accuracy of around 85.46%
+# confusion matrix indicates accuracy of around 85.46% for ensemble 1
 ##################################################################################
-preds_ens <- (predict(model_tree, events_to_dt(events_test))[,2] + preds_lr)/2
-confusionMatrix(factor(preds_ens>0.5), factor(events_test$accurate), positive = "TRUE")
+preds_ens1 <- (preds_tree + preds_lr)/2
+confusionMatrix(factor(preds_ens1>0.5), factor(events_test$accurate), positive = "TRUE")
+
+preds_ens2 <- (preds_tree + preds_lr + preds_rf)/3
+confusionMatrix(factor(preds_ens2>0.5), factor(events_test$accurate), positive = "TRUE")

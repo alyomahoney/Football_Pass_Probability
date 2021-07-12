@@ -23,7 +23,6 @@ if(!require(Rborist)) install.packages("Rborist", repos = "http://cran.us.r-proj
 library(caret)      # machine learning (decision tree and confusion matrix)
 library(ggthemes)   # gdocs theme
 library(magrittr)   # %$% and %<>%
-#library(modiscloud) 
 library(rjson)      # read .json files
 library(tidyverse)  # tidyverse suite of packages
 library(png)        # read .png file
