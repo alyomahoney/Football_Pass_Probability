@@ -18,6 +18,7 @@ if(!require(neighbr))    install.packages("neighbr", repos = "http://cran.us.r-p
 if(!require(ggcorrplot)) install.packages("ggcorrplot", repos = "http://cran.us.r-project.org")
 if(!require(rpart))      install.packages("rpart", repos = "http://cran.us.r-project.org")
 if(!require(rpart.plot)) install.packages("rpart.plot", repos = "http://cran.us.r-project.org")
+if(!require(Rborist)) install.packages("Rborist", repos = "http://cran.us.r-project.org")
 
 library(caret)      # machine learning (decision tree and confusion matrix)
 library(ggthemes)   # gdocs theme
@@ -31,3 +32,4 @@ library(neighbr)    # knn with jaccard distance
 library(ggcorrplot) # correlation plot
 library(rpart)      # construct decision tree
 library(rpart.plot) # plot decision tree algorithm
+library(Rborist)    # random forest

@@ -175,32 +175,33 @@ confusionMatrix(factor(preds_tree>0.5), factor(events_test$accurate),
 
 ##################################################################################
 # random forest
-# similar to KNN, the dataset is too large to train this algorithm in a reasonable time
-# DO NOT RUN
+# this doesn't actually predict as well as the decision tree or logistic regression
 ##################################################################################
-#model_rf <- train(accurate~.,
-#                  method = "rf",
-#                  tuneGrid = data.frame(mtry = 3:11),
-#                  data = events_to_dt(events_train))
-#
-#ggplot(model_rf, highlight = TRUE) +
-#  scale_x_discrete(limits = 2:12) +
-#  ggtitle("Accuracy for each number of randomly selected predictors")
-#
-#model_rf$results %>% 
-#  ggplot(aes(x = mtry, y = Accuracy)) +
-#  geom_line() +
-#  geom_point() +
-#  geom_errorbar(aes(x = mtry, 
-#                    ymin = Accuracy - AccuracySD,
-#                    ymax = Accuracy + AccuracySD))
-#
-#preds_rf <- predict(model_rf, test)
-#
-#cm_rf <- confusionMatrix(preds_rf, test$class)
-#
-#importance(model_rf$finalModel)
-#
+set.seed(4)
+model_rf <- train(accurate~.,
+                  method = "Rborist",
+                  tuneGrid = data.frame(predFixed = 2:4,
+                                        minNode = 2),
+                  nTree = 100,
+                  nSamp = 100000,
+                  data = events_to_dt(events_train))
+
+ggplot(model_rf, highlight = TRUE) +
+  scale_x_discrete(limits = 2:12) +
+  ggtitle("Accuracy for each number of randomly selected predictors")
+
+model_rf$results %>% 
+  ggplot(aes(x = predFixed, y = Accuracy)) +
+  geom_line() +
+  geom_point() +
+  geom_errorbar(aes(x = predFixed, 
+                    ymin = Accuracy - AccuracySD,
+                    ymax = Accuracy + AccuracySD))
+
+preds_rf <- predict(model_rf, events_to_dt(events_test), type = "prob")
+
+confusionMatrix(preds_rf, factor(events_test$accurate), positive = "TRUE")
+
 ##################################################################################
 # ensemble of logistic regression and decision tree
 # simply take the mean of each probability prediction
